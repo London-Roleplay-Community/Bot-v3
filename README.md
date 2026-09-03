@@ -1,6 +1,7 @@
 ## RandomCommands
 > Generated with CommandKit
-A random open-sourced Discord bot meant for 
+> 
+A random open-sourced Discord bot meant for:
 
 ## To run this project
 
