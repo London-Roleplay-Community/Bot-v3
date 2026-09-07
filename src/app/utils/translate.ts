@@ -11,7 +11,8 @@ export async function translate(text: string) {
     const result = await trans(text, { to: 'en' });
     return { text: result.text, lang: result.src }
   } catch (error) {
-    Logger.error(error)
+    Logger.error(error);
+    return false;
   }
 }
 
@@ -26,6 +27,7 @@ export async function translateLang(text: string, languageCode: string) {
     const result = await trans(text, { to: languageCode })
     return { text: result.text, lang: result.src }
   } catch (error) {
-    
+    Logger.error(error);
+    return false;
   }
 }

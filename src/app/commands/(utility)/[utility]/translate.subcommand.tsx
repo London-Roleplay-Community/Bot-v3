@@ -1,5 +1,7 @@
-import { type ChatInputCommand, type MessageCommand, type CommandData, Container, TextDisplay, Separator, AutocompleteCommand, Logger } from 'commandkit';
-import { ApplicationCommandOptionType, MessageFlags } from 'discord.js';
+import { type ChatInputCommand, type MessageCommand, type CommandData, Container, TextDisplay, Separator, AutocompleteCommand, Logger, Section, Thumbnail } from 'commandkit';
+import { ApplicationCommandOptionType, Colors, EmbedBuilder, MessageFlags, SeparatorSpacingSize } from 'discord.js';
+import { translate, translateLang } from '../../../utils/translate.ts';
+import errorContainer from '../../../components/errorContainer.tsx';
 
 const languages = [
   { name: 'English', value: 'en' },
@@ -41,17 +43,17 @@ export const command: CommandData = {
   description: "Translates a message",
   options: [
     {
-      name: 'to',
-      description: 'The specified language to translate to',
-      type: ApplicationCommandOptionType.String,
-      autocomplete: true,
-      required: true
-    },
-    {
       name: 'text',
       description: 'The text to translate',
       type: ApplicationCommandOptionType.String,
       required: true
+    },
+    {
+      name: 'to',
+      description: 'The specified language to translate to (if omitted, will be English)',
+      type: ApplicationCommandOptionType.String,
+      autocomplete: true,
+      required: false
     }
   ]
 };
@@ -77,8 +79,29 @@ export const autocomplete: AutocompleteCommand = async ({ interaction }) => {
 }
 
 export const chatInput: ChatInputCommand = async ({interaction}) => {
-  const toLang = interaction.options.getString("to", true);
+  const toLang = interaction.options.getString("to");
   const text = interaction.options.getString("text", true);
+  if (toLang) {
+    const formattedLang = languages.find(language => language.value === toLang)?.name;
+    const translated = await translateLang(text, toLang);
+    if (translated === false) {
+      return interaction.reply({ components: [errorContainer("An error occurred when attempting to translate this message")], flags: [MessageFlags.IsComponentsV2, MessageFlags.Ephemeral] });
+    } else {
+      const formattedReturn = languages.find(language => language.value === translated.lang);
+      const response = new EmbedBuilder().setAuthor({ iconURL: interaction.user.avatarURL()!, name: `${formattedLang} → ${formattedReturn}` }).setDescription(translated.text);
 
-  return interaction.reply({ content: `${toLang}, ${text}` })
+      return interaction.reply({ embeds: [response], flags: [MessageFlags.Ephemeral] })
+    }
+  } else {
+    const formattedLang = "English";
+    const translated = await translate(text);
+    if (translated === false) {
+      return interaction.reply({ components: [errorContainer("An error occurred when attempting to translate this message")], flags: [MessageFlags.IsComponentsV2, MessageFlags.Ephemeral] });
+    } else {
+      const formattedReturn = languages.find(language => language.value === translated.lang)?.name
+      const response = new EmbedBuilder().setAuthor({ iconURL: interaction.user.avatarURL()!, name: `${formattedReturn} → ${formattedLang}` }).setDescription(translated.text);
+
+      return interaction.reply({ embeds: [response], flags: [MessageFlags.Ephemeral] })
+    }
+  }
 }; //TODO: Link up translate file with this and return that with jsx components
