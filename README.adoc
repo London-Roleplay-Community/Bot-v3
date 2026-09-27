@@ -1,6 +1,6 @@
 :doctype: book
 :icons: font
-+++<sub>Jaxon Beltran – jaxon@jxson.tech – Version 3.0.2-Alpha, 2026-09-27</sub>+++
++++<sub>Jaxon Beltran â€“ jaxon@jxson.tech â€“ Version 3.0.3-Alpha, 2026-09-27, 2026-09-27</sub>+++
 
 ## Bot-v3: The third iteration of our Discord bot.
 ### Usage
