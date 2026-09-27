@@ -1,4 +1,16 @@
-= LRC Bot v3
-Jaxon Beltran <jaxon@jxson.tech>
-v3.0, 2026-09-27
+:doctype: book
 :icons: font
++++<sub>Jaxon Beltran – jaxon@jxson.tech – Version 3.0.2-Alpha, 2026-09-27</sub>+++
+
+## Bot-v3: The third iteration of our Discord bot.
+### Usage
+The bot uses slash commands and ComponentsV2. It's fairly simple to understand.
+
+#### Dependencies
+* MongoDB
+* Roblox ranking cookie and API key
+* Rozod
+* ...or just run `pnpm i` to install all dependencies.
+
+### Installation
+Git clone our repository, then run `pnpm i` / `npm i` to install all dependencies. Then, run `pnpm run dev` to start the bot in a development environment. You can run `pnpm run build` to build the bot for a stable release of the bot.

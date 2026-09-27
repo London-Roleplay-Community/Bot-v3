@@ -1,7 +1,7 @@
-= Todo
-Jaxon Beltran <jaxon@jxson.tech>
-v3.0.2-alpha, 2026-09-27
-:icons: font
+:doctype: book
++++<sub>Jaxon Beltran – jaxon@jxson.tech – Version 3.0.2-Alpha, 2026-09-27</sub>+++
+# Todo
+
 
 [cols="1,1",options="header"]
 |===
