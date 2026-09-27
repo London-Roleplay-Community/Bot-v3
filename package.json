@@ -22,7 +22,7 @@
   },
   "dependencies": {
     "axios": "^1.20.0",
-    "commandkit": "1.2.1-dev.20260414125348",
+    "commandkit": "1.2.1",
     "discord.js": "^14.27.0",
     "googletrans": "^1.0.29",
     "jiti": "^2.7.0",

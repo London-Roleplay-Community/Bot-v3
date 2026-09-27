@@ -12,8 +12,8 @@ importers:
         specifier: ^1.20.0
         version: 1.20.0(debug@4.4.3)
       commandkit:
-        specifier: 1.2.1-dev.20260414125348
-        version: 1.2.1-dev.20260414125348(typescript@5.9.3)
+        specifier: 1.2.1
+        version: 1.2.1(typescript@5.9.3)
       discord.js:
         specifier: ^14.27.0
         version: 14.27.0
@@ -735,8 +735,8 @@ packages:
     resolution: {integrity: sha512-H+y0Jo/T1RZ9qPP4Eh1pkcQcLRglraJaSLoyOtHxu6AapkjWVCy2Sit1QQ4x3Dng8qDlSsZEet7g5Pq06MvTgw==}
     engines: {node: '>=20'}
 
-  commandkit@1.2.1-dev.20260414125348:
-    resolution: {integrity: sha512-u7ct+DAFXiPPYkx7rbLQsnBRt/CK7aEWn6on3gK6EQlxFHh659o30CSF5UNlXxF0G4fDY+ThwuNkVXjmolIGgg==}
+  commandkit@1.2.1:
+    resolution: {integrity: sha512-3vbwcfLeHkzoLYlAc8ls/OafSlrIljozvvj3/ru5teQutvBFx7xs4+U7ONAVJR8ANdx/EGAXIXd6JxwLgKrRWA==}
     engines: {node: '>=24'}
     hasBin: true
 
@@ -1840,8 +1840,8 @@ snapshots:
 
   '@babel/generator@8.0.0-rc.3':
     dependencies:
-      '@babel/parser': 8.0.0-rc.3
-      '@babel/types': 8.0.0-rc.3
+      '@babel/parser': 8.0.4
+      '@babel/types': 8.0.4
       '@jridgewell/gen-mapping': 0.3.13
       '@jridgewell/trace-mapping': 0.3.31
       '@types/jsesc': 2.5.1
@@ -1942,7 +1942,7 @@ snapshots:
 
   '@babel/parser@8.0.0-rc.3':
     dependencies:
-      '@babel/types': 8.0.0-rc.3
+      '@babel/types': 8.0.4
 
   '@babel/parser@8.0.4':
     dependencies:
@@ -2014,7 +2014,7 @@ snapshots:
   '@babel/types@8.0.0-rc.3':
     dependencies:
       '@babel/helper-string-parser': 8.0.0
-      '@babel/helper-validator-identifier': 8.0.0-rc.3
+      '@babel/helper-validator-identifier': 8.0.4
 
   '@babel/types@8.0.4':
     dependencies:
@@ -2581,7 +2581,7 @@ snapshots:
 
   commander@14.0.3: {}
 
-  commandkit@1.2.1-dev.20260414125348(typescript@5.9.3):
+  commandkit@1.2.1(typescript@5.9.3):
     dependencies:
       '@rollup/plugin-json': 6.1.0
       chokidar: 4.0.3
