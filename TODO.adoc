@@ -1,6 +1,6 @@
 = Todo
 Jaxon Beltran <jaxon@jxson.tech>
-v3.0.2-alpha, 2026-09-27
+v3.0.39-alpha, 2026-09-27
 :icons: font
 
 [cols="1,1",options="header"]
