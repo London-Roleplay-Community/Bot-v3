@@ -1,0 +1,13 @@
+{
+  "eslint.rules.customizations": [
+    { "rule": "*", "severity": "info" }
+  ],
+  "files.exclude": {
+    "**/.git": false,
+    "**/.svn": true,
+    "**/.hg": true,
+    "**/.jj": true,
+    "**/.DS_Store": true,
+    "**/Thumbs.db": true
+  }
+}

@@ -1,5 +1,5 @@
-import { type ChatInputCommand, type MessageCommand, type CommandData, Container, TextDisplay, Separator, AutocompleteCommand, Logger, Section, Thumbnail } from 'commandkit';
-import { ApplicationCommandOptionType, Colors, EmbedBuilder, MessageFlags, SeparatorSpacingSize } from 'discord.js';
+import { type ChatInputCommand, type CommandData, AutocompleteCommand, Logger } from 'commandkit';
+import { ApplicationCommandOptionType, EmbedBuilder, MessageFlags } from 'discord.js';
 import { translate, translateLang } from '../../../utils/translate.ts';
 import errorContainer from '../../../components/errorContainer.tsx';
 

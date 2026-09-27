@@ -1,0 +1,4 @@
+= LRC Bot v3
+Jaxon Beltran <jaxon@jxson.tech>
+v3.0, 2026-09-27
+:icons: font

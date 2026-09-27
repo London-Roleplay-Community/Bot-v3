@@ -1,4 +1,4 @@
-import { ActionRow, Button, CommandData, CommandMetadata, Container, MessageContextMenuCommand, Section, Separator, TextDisplay, UserContextMenuCommand } from 'commandkit';
+import { ActionRow, Button, CommandData, CommandMetadata, Container, MessageContextMenuCommand, Separator, TextDisplay, UserContextMenuCommand } from 'commandkit';
 import { ButtonStyle, MessageFlags, SeparatorSpacingSize } from 'discord.js';
 import errorContainer from '../../components/errorContainer.tsx';
 

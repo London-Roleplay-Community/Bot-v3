@@ -1,0 +1,58 @@
+= Todo
+Jaxon Beltran <jaxon@jxson.tech>
+v3.0.1-alpha, 2026-09-27
+:icons: font
+
+[cols="1,1",options="header"]
+|===
+| Files or topic | To do
+| `app.ts` | <<_app_ts>>
+| `utils\rblxClient.ts` | https://github.com/London-Roleplay-Community/lrcBotV2/blob/master/src/app/helpers/rblxClient.ts[Implement this]
+| `utils\configuration\ticketConfig.ts` | https://github.com/London-Roleplay-Community/lrcBotV2/blob/master/src/app/helpers/ticket-config.ts[Implement this, but replace most of this with enums]
+| MongoDB | Implement cross-server compatibility feature
+| SSU | Fix SSU bug
+| Wait
+a| [source, typescript]
+----
+export const wait = (s : number) => new Promise<void>(resolve => setTimeout(resolve, Math.floor(s * 1000)))
+----
+|===
+
+== app.ts
+NOTE: Ensure global application is turned on in Discord Developer Portal; multiple server support
+
+Automatic workers::
+* Automatic workers
+** Sanctions
+*** Ban worker
+*** https://github.com/London-Roleplay-Community/lrcBotV2/blob/master/src/app.ts#L135[Rblx sanction expiry worker]
+** Scheduled trainings
+** Scheduled SSUs 
+
+* Utils
+** Initialize ILogger consolelogger https://github.com/London-Roleplay-Community/lrcBotV2/blob/master/src/app.ts[(example here)]
+
+* Implement rozod and initialize it;
++
+----
+pnpm i rozod
+----
++
+[source, typescript]
+----
+import { configureServer } from 'rozod'
+
+// in client.once(): 
+configureServer({ cookies: process.env.RANKING_COOKIE, cloudKey: process.env.RBLX_APIKEY });
+----
+
+* Ensure .once() is implemented for workers:
++
+[source, typescript]
+----
+client.once("clientReady", () => {
+  configureServer({ cookies: process.env.RANKING_COOKIE, cloudKey: process.env.RBLX_APIKEY });
+});
+----
+
+==
