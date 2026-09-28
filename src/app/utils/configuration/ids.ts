@@ -1,17 +1,17 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-unused-vars */
-enum channelIds {
-  MLOGS = 1,
-  REPORTS = 2,
-  SANCTIONS = 3,
-  TRANSCRIPTS = 4,
-  NOTE_LOGS = 5, //* use for sending wia notes to users /
-  GIT = 6,
+enum ChannelIds {
+  MOD_LOGS_THREAD = "modLogs",
+  TRANSCRIPTS = "transcriptsChannel",
+  GIT = "git",
+  NOTE_LOGS = "noteLogs",
+  CONTEXT_MENU_REPORT_LOGS = "contextMenuReportLogs",
+  ACTION_LOGS = "actionLogs",
+  IN_GAME_SANCTIONS = "inGameSanctions"
 }
 
-enum categoryIds {
-  ETICKETS = 1,
-  TICKETS = 2,
+enum CategoryIds {
+  ETICKETS = "escTickets",
+  TICKETS = "tickets"
 }
 
-export { channelIds };
+export { ChannelIds, CategoryIds };

@@ -1,5 +1,5 @@
 :doctype: book
-+++<sub>Jaxon Beltran - jaxon@jxson.tech - Version 3.0.1-Alpha, 2026-09-27, 2026-09-27</sub>+++
++++<sub>Jaxon Beltran - jaxon@jxson.tech - Version 3.0.2-Alpha, 2026-09-27, 2026-09-27</sub>+++
 
 # Todo
 
