@@ -1,0 +1,91 @@
+name: Weekly OpenRouter Code Review
+on:
+  schedule:
+    - cron: '0 12 * * 5' # Automatically runs every Friday at 12:00 PM UTC
+  workflow_dispatch: # Allows manual trigger anytime
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install Dependencies
+        run: pip install requests
+
+      - name: Run Codebase Analysis
+        env:
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+        run: |
+          python - << 'EOF'
+          import os
+          import json
+          import requests
+
+          ignored_dirs = ['node_modules', '.commandkit', 'bin', '.git', 'dist', 'build']
+          valid_extensions = ['.ts', '.tsx', '.js', '.jsx', '.java']
+          codebase_content = ""
+          
+          for root, dirs, files in os.walk('.'):
+              dirs[:] = [d for d in dirs if d not in ignored_dirs]
+              for file in files:
+                  if any(file.endswith(ext) for ext in valid_extensions):
+                      file_path = os.path.join(root, file)
+                      try:
+                          with open(file_path, 'r', encoding='utf-8') as f:
+                              codebase_content += f"\n\n--- File: {file_path} ---\n" + f.read()
+                      except Exception:
+                          pass
+
+          if not codebase_content:
+              print("No matching source files found to review.")
+              exit(0)
+
+          url = "https://openrouter.ai"
+          headers = {
+              "Authorization": f"Bearer {os.getenv('OPENROUTER_API_KEY')}",
+              "Content-Type": "application/json"
+          }
+          
+          prompt = (
+              "You are a principal software engineer. Review the following codebase files and generate "
+              "a structured weekly health update report. Focus on:\n"
+              "1. Potential bugs, runtime logic errors, or edge cases.\n"
+              "2. Code quality, performance improvements, and modularity defects.\n"
+              "3. Actionable refactoring recommendations.\n\n"
+              f"Codebase:\n{codebase_content}"
+          )
+
+          data = {
+              "model": "deepseek/deepseek-chat:free",
+              "messages": [{"role": "user", "content": prompt}]
+          }
+
+          response = requests.post(url, headers=headers, data=json.dumps(data))
+          
+          if response.status_code == 200:
+              result = response.json()
+              review_text = result['choices']['message']['content']
+              with open("weekly_update.md", "w", encoding="utf-8") as out:
+                  out.write(review_text)
+              print("Successfully generated weekly update report.")
+          else:
+              print(f"API Error: {response.status_code}")
+              exit(1)
+          EOF
+
+      - name: Send Report to Discord
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        run: |
+          payload='{"content": "### 🛠️ Weekly Code Review\nThe automated code review update has compiled successfully. The complete review document is attached below"}'
+          
+          curl -H "Content-Type: application/json" -X POST -d "$payload" "$DISCORD_WEBHOOK_URL"
+          
+          curl -X POST -F "file=@weekly_update.md" "$DISCORD_WEBHOOK_URL"
