@@ -72,7 +72,7 @@ jobs:
           )
 
           data = {
-              "model": "deepseek/deepseek-chat:free",
+              "model": "deepseek/deepseek-chat",
               "messages": [{"role": "user", "content": prompt}]
           }
 
