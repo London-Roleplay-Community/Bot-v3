@@ -50,7 +50,9 @@ jobs:
           url = "https://openrouter.ai"
           headers = {
               "Authorization": f"Bearer {os.getenv('OPENROUTER_API_KEY')}",
-              "Content-Type": "application/json"
+              "Content-Type": "application/json",
+              "HTTP-Referer": "https://github.com", # Required header for OpenRouter analytics
+              "X-Title": "GitHub Actions Code Reviewer"
           }
           
           prompt = (
@@ -69,14 +71,21 @@ jobs:
 
           response = requests.post(url, headers=headers, data=json.dumps(data))
           
+          # Gracefully intercept non-200 errors so it logs the raw text instead of throwing a JSON crash
           if response.status_code == 200:
-              result = response.json()
-              review_text = result['choices']['message']['content']
-              with open("weekly_update.md", "w", encoding="utf-8") as out:
-                  out.write(review_text)
-              print("Successfully generated weekly update report.")
+              try:
+                  result = response.json()
+                  review_text = result['choices'][0]['message']['content'] # Fixed target indices path
+                  with open("weekly_update.md", "w", encoding="utf-8") as out:
+                      out.write(review_text)
+                  print("Successfully generated weekly update report.")
+              except Exception as e:
+                  print(f"Failed to parse valid OpenRouter JSON response: {e}")
+                  print(f"Raw Output: {response.text}")
+                  exit(1)
           else:
-              print(f"API Error: {response.status_code}")
+              print(f"API Error Response Status Code: {response.status_code}")
+              print(f"Server Response Text: {response.text}")
               exit(1)
           EOF
 
