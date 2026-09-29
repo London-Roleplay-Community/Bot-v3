@@ -1,8 +1,9 @@
 name: Weekly OpenRouter Code Review
+
 on:
   schedule:
-    - cron: '0 12 * * 5' # Automatically runs every Friday at 12:00 PM UTC
-  workflow_dispatch: # Allows manual trigger anytime
+    - cron: '0 12 * * 5'
+  workflow_dispatch: 
 
 jobs:
   review:
@@ -28,10 +29,11 @@ jobs:
           import json
           import requests
 
-          ignored_dirs = ['node_modules', '.commandkit', 'bin', '.git', 'dist', 'build']
+          ignored_dirs = ['node_modules', '.commandkit', 'bin', '.git', 'dist', 'build', '.next', 'coverage']
           valid_extensions = ['.ts', '.tsx', '.js', '.jsx', '.java']
           codebase_content = ""
-          
+          max_chars = 200_000  # Cap context size to avoid context limit errors
+
           for root, dirs, files in os.walk('.'):
               dirs[:] = [d for d in dirs if d not in ignored_dirs]
               for file in files:
@@ -39,22 +41,27 @@ jobs:
                       file_path = os.path.join(root, file)
                       try:
                           with open(file_path, 'r', encoding='utf-8') as f:
-                              codebase_content += f"\n\n--- File: {file_path} ---\n" + f.read()
-                      except Exception:
-                          pass
+                              file_data = f.read()
+                              if len(codebase_content) + len(file_data) > max_chars:
+                                  print("Reached context limit threshold; stopping file aggregation.")
+                                  break
+                              codebase_content += f"\n\n--- File: {file_path} ---\n" + file_data
+                      except Exception as e:
+                          print(f"Warning: Failed to read {file_path}: {e}")
 
           if not codebase_content:
               print("No matching source files found to review.")
               exit(0)
 
-          url = "https://openrouter.ai"
+          # FIXED: Correct OpenRouter Chat Completions API endpoint
+          url = "https://openrouter.ai/api/v1/chat/completions"
           headers = {
               "Authorization": f"Bearer {os.getenv('OPENROUTER_API_KEY')}",
               "Content-Type": "application/json",
-              "HTTP-Referer": "https://github.com", # Required header for OpenRouter analytics
+              "HTTP-Referer": "https://github.com",
               "X-Title": "GitHub Actions Code Reviewer"
           }
-          
+
           prompt = (
               "You are a principal software engineer. Review the following codebase files and generate "
               "a structured weekly health update report. Focus on:\n"
@@ -70,12 +77,11 @@ jobs:
           }
 
           response = requests.post(url, headers=headers, data=json.dumps(data))
-          
-          # Gracefully intercept non-200 errors so it logs the raw text instead of throwing a JSON crash
+
           if response.status_code == 200:
               try:
                   result = response.json()
-                  review_text = result['choices'][0]['message']['content'] # Fixed target indices path
+                  review_text = result['choices'][0]['message']['content']
                   with open("weekly_update.md", "w", encoding="utf-8") as out:
                       out.write(review_text)
                   print("Successfully generated weekly update report.")
@@ -85,16 +91,14 @@ jobs:
                   exit(1)
           else:
               print(f"API Error Response Status Code: {response.status_code}")
-              print(f"Server Response Text: {response.text}")
+              print(f"Raw Output: {response.text}")
+              # FIXED: Ensure job fails when API request fails
               exit(1)
           EOF
 
-      - name: Send Report to Discord
-        env:
-          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
-        run: |
-          payload='{"content": "### 🛠️ Weekly Code Review\nThe automated code review update has compiled successfully. The complete review document is attached below"}'
-          
-          curl -H "Content-Type: application/json" -X POST -d "$payload" "$DISCORD_WEBHOOK_URL"
-          
-          curl -X POST -F "file=@weekly_update.md" "$DISCORD_WEBHOOK_URL"
+      - name: Upload Review Artifact
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: weekly-code-review
+          path: weekly_update.md
