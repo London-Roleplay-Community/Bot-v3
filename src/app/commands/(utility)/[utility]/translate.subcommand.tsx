@@ -1,6 +1,6 @@
 import { type ChatInputCommand, type CommandData, AutocompleteCommand, Logger } from 'commandkit';
 import { ApplicationCommandOptionType, EmbedBuilder, MessageFlags } from 'discord.js';
-import { translate, translateLang } from '../../../utils/translate.ts';
+import { translate, translateLang } from '../../../../../utils/translate.ts';
 import errorContainer from '../../../components/errorContainer.tsx';
 
 const languages = [
