@@ -1,12 +1,12 @@
 import { Logger, type EventHandler } from 'commandkit';
-import validateInteraction from '../../utils/validateInteraction.ts';
+import validateInteraction from '../../../../utils/validateInteraction.ts';
 import errorContainer from '../../components/errorContainer.tsx';
 import { MessageFlags } from 'discord.js';
 import { mClient } from '../../../app.ts';
-import ServerCollection from '../../utils/types/ServerCollection.ts';
+import ServerCollection from '../../../../utils/types/ServerCollection.ts';
 import { Collection } from 'mongodb';
 import successContainer from '../../components/successContainer.tsx';
-import { CFlags } from '../../utils/types/CFlags.ts';
+import { CFlags } from '../../../../utils/types/CFlags.ts';
 
 
 

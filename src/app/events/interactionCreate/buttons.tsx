@@ -1,9 +1,9 @@
 import type { EventHandler } from 'commandkit';
-import ServerCollection from '../../utils/types/ServerCollection.ts';
+import ServerCollection from '../../../../utils/types/ServerCollection.ts';
 import { Collection } from 'mongodb';
 import { mClient } from '../../../app.ts';
 import errorContainer from '../../components/errorContainer.tsx';
-import { CFlags } from '../../utils/types/CFlags.ts';
+import { CFlags } from '../../../../utils/types/CFlags.ts';
 import successContainer from '../../components/successContainer.tsx';
 
 const handler: EventHandler<'interactionCreate'> = async (interaction) => {
