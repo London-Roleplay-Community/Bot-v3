@@ -21,6 +21,7 @@
     "typescript-eslint": "^8.70.1"
   },
   "dependencies": {
+    "@commandkit/ratelimit": "^1.2.2",
     "axios": "^1.20.0",
     "commandkit": "1.2.1-dev.20260414125348",
     "discord.js": "^14.27.0",

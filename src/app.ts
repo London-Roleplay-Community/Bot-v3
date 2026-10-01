@@ -2,6 +2,7 @@ import { Client } from 'discord.js';
 import { MongoClient, ServerApiVersion } from 'mongodb';
 import dns from "dns";
 import { Logger } from 'commandkit';
+import { configureRatelimit } from "@commandkit/ratelimit";
 
 dns.setServers(['1.1.1.1']);
 
@@ -19,6 +20,16 @@ const mClient = new MongoClient(process.env.DB_CONNECTION!, { serverApi: { versi
     Logger.error(error)
   }
 })();
+
+//* Plugins
+configureRatelimit({
+  defaultLimiter: {
+    maxRequests: 5,
+    interval: '1m',
+    scope: 'user',
+    algorithm: 'fixed-window'
+  }
+})
 
 export { mClient };
 export default client;
