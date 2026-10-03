@@ -2,7 +2,8 @@ import { Client } from 'discord.js';
 import { MongoClient, ServerApiVersion } from 'mongodb';
 import dns from "dns";
 import { Logger } from 'commandkit';
-import { configureRatelimit } from "@commandkit/ratelimit";
+import { connect } from '../utils/configuration/database.ts';
+
 
 dns.setServers(['1.1.1.1']);
 
@@ -10,26 +11,19 @@ const client = new Client({
   intents: ['Guilds', 'GuildMembers', 'GuildMessages', 'MessageContent', 'GuildMessageReactions'],
 });
 
-const mClient = new MongoClient(process.env.DB_CONNECTION!, { serverApi: { version: ServerApiVersion.v1, strict: true, deprecationErrors: true } });
+function checkenv() {
+  const vars = ["DISCORD_TOKEN", "AZURE_USERNAME", "AZURE_PASSWORD", "AZURE_ENDPOINT", "R2_ENDPOINT", "R2_SECRET_ACCESS_KEY", "R2_ACCESS_KEY_ID", "R2_BUCKET", "URL", "API", "API_KEY", "RBLX_APIKEY", "RANKING_COOKIE"]
 
-(async () => {
-  try {
-    await mClient.connect();
-    Logger.info(`MongoDB connected`)
-  } catch (error) {
-    Logger.error(error)
+  for (const v of vars) {
+    if (!process.env[v]) {
+      Logger.error(`Missing env var: ${v}`)
+      process.exit(1)
+    }
   }
-})();
+}
+checkenv()
 
-//* Plugins
-configureRatelimit({
-  defaultLimiter: {
-    maxRequests: 5,
-    interval: '1m',
-    scope: 'user',
-    algorithm: 'fixed-window'
-  }
-})
 
-export { mClient };
+await connect();
+
 export default client;

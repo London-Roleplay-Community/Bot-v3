@@ -1,5 +1,5 @@
 import { type ChatInputCommand, type CommandData, AutocompleteCommand, Logger } from 'commandkit';
-import { ApplicationCommandOptionType, EmbedBuilder, MessageFlags } from 'discord.js';
+import { ApplicationCommandOptionType, ApplicationCommandType, ChatInputApplicationCommandData, EmbedBuilder, MessageFlags } from 'discord.js';
 import { translate, translateLang } from '../../../../../utils/translate.ts';
 import errorContainer from '../../../components/errorContainer.tsx';
 
@@ -56,7 +56,7 @@ export const command: CommandData = {
       required: false
     }
   ]
-};
+} as ChatInputApplicationCommandData as CommandData;
 
 export const autocomplete: AutocompleteCommand = async ({ interaction }) => {
   try {

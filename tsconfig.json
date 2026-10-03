@@ -3,10 +3,12 @@
   "compilerOptions": {
     "lib": ["ESNext", "DOM"],
     "target": "ESNext",
-    "moduleResolution": "nodenext",
-    "module": "nodenext",
+    "moduleResolution": "bundler",
+    "module": "ESNext",
     "allowImportingTsExtensions": true,
     "esModuleInterop": true,
+    "moduleDetection": "force",
+    "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
@@ -20,9 +22,15 @@
     "jsx": "react-jsx",
     "jsxImportSource": "commandkit",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"] 
     }
   },
-  "include": ["src", "commandkit.config.ts", "commandkit-env.d.ts"],
+  "include": [
+    "src/**/*", 
+    "commandkit.config.ts", 
+    "commandkit-env.d.ts", 
+    "scripts/**/*",
+    "utils/**/*"
+  ],
   "exclude": ["dist", "node_modules", ".commandkit"]
 }

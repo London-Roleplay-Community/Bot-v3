@@ -1,9 +1,14 @@
-import type { EventHandler } from "commandkit";
-import { mClient } from "../../../app.ts";
+import { type EventHandler, Logger } from "commandkit";
+import { createGuildData } from "../../../../utils/configuration/schema.ts";
+import { guildsCollection } from "../../../../utils/configuration/database.ts";
 
 const handler: EventHandler<'guildCreate'> = async (interaction) => {
-  console.log("Joined server")
-  await mClient.db("servers").collection(interaction.id).insertOne({ name: interaction.name, id: interaction.id, channels: {}, categories: {}, completedSetup: false })
+  try {
+    await guildsCollection.updateOne({ id: interaction.id }, { $setOnInsert: createGuildData(interaction.id, interaction.name) }, { upsert: true })
+    Logger.log(`Initialized server for ${interaction.name}`)
+  } catch (error) {
+    Logger.error(`Failed to create document in Azure... ${error}`)
+  }
 }
 
 export default handler;

@@ -2,8 +2,8 @@ import { type ChatInputCommand, type CommandData, Container, TextDisplay, Separa
 import { ButtonStyle, ChannelType, MessageFlags, SeparatorSpacingSize } from 'discord.js';
 
 export const command: CommandData = {
-  name: 'setup',
-  description: "Sets up the bot",
+  name: 'server',
+  description: "Sets up the server for the bot",
 };
 
 export const chatInput: ChatInputCommand = async ({interaction}) => {

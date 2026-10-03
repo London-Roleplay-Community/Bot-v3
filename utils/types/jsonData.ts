@@ -30,4 +30,9 @@ export enum ServerUpdateError {
   READ_ERROR = 3,
 }
 
+export enum ServerCreateError {
+  UNKNOWN_ERROR = 1,
+  READ_ERROR = 2
+}
+
 export const jsonPath = path.resolve(process.cwd(), "utils", "configuration", "serverInfo.json")

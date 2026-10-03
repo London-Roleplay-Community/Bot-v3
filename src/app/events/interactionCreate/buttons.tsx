@@ -1,10 +1,8 @@
 import type { EventHandler } from 'commandkit';
-import ServerCollection from '../../../../utils/types/ServerCollection.ts';
-import { Collection } from 'mongodb';
-import { mClient } from '../../../app.ts';
 import errorContainer from '../../components/errorContainer.tsx';
 import { CFlags } from '../../../../utils/types/CFlags.ts';
 import successContainer from '../../components/successContainer.tsx';
+import { guildsCollection } from '../../../../utils/configuration/database.ts';
 
 const handler: EventHandler<'interactionCreate'> = async (interaction) => {
   if (!interaction.guildId || !interaction.guild) return;
@@ -13,16 +11,12 @@ const handler: EventHandler<'interactionCreate'> = async (interaction) => {
     const interactionInfo = { command, topic, userId }
     if (interactionInfo.command === "setup") {
       if (interactionInfo.topic === "done") {
-        const collection: Collection<ServerCollection> = mClient.db("servers").collection(interaction.guildId)
-        const doc = await collection.findOne({ id: interaction.guild.id });
-        if (!doc) {
-          interaction.reply({ components: [errorContainer("No database exists! Kick the bot out and re-invite it.")], flags: CFlags.CV2_EPH });
-          return;
-        }
-        const channelLength = Object.keys(doc.channels).length;
-        const categoryLength = Object.keys(doc.categories).length;
+        const server = await guildsCollection.findOne({ id: interaction.guildId })
+        if (!server) { interaction.reply({ components: [errorContainer("Could not fetch server from JSON!")], flags: CFlags.CV2_EPH }); return; }
+        const channelLength = Object.keys(server.channels).length
+        const categoryLength = Object.keys(server.categories).length
         if (channelLength === 7 && categoryLength === 2) {
-          await collection.updateOne({ id: interaction.guild.id }, { $set: { "completedSetup": true } })
+          await guildsCollection.updateOne({ id: interaction.guild.id }, { $set: { completedSetup: true } })
           interaction.reply({ components: [successContainer("You're all good! Your server has been marked as setup.")], flags: CFlags.CV2_EPH })
           return;
         } else {
