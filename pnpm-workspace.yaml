@@ -1,2 +1,6 @@
 allowBuilds:
+  '@parcel/watcher': true
   esbuild: true
+  unrs-resolver: false
+patchedDependencies:
+  yangonkit: patches/yangonkit.patch
