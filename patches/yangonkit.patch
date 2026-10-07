@@ -1,0 +1,65 @@
+diff --git a/dist/index.js b/dist/index.js
+index 7eb99c61175faee7773d639c6aa064720c7fda76..8e1d9642305c4475f9f8e25cd2ea106ab1fe0a09 100644
+--- a/dist/index.js
++++ b/dist/index.js
+@@ -231,7 +231,7 @@ const ${tmpVarName} = ${paramName}.interaction.options;
+ var YangonKit = class extends import_commandkit2.CompilerPlugin {
+   name = "com.retrouser955.commadkit.yangonkit";
+   async activate(ctx) {
+-    import_commandkit2.Logger.info("YangonKit Activated");
++    import_commandkit2.Logger.info("YangonKit Activated (patched)");
+     ctx.registerTemplate("command", async (args) => {
+       const namePlain = args.splice(0, 1)[0];
+       if (!namePlain) throw new Error("name is required.");
+@@ -254,7 +254,9 @@ var YangonKit = class extends import_commandkit2.CompilerPlugin {
+     import_commandkit2.Logger.info("YangonKit going out!");
+   }
+   async transform(params) {
+-    const { code, id } = params;
++    console.log("[yangonkit] transform:", Object.keys(params), params.id)
++    const { code } = params;
++    const id = params.id.replace(/\\/g, "/");
+     if (!id.includes("/commands/")) return;
+     if (id.endsWith("+middleware.ts")) return;
+     import_commandkit2.Logger.info(`[YANGON KIT]: Generating code for: ${id}`);
+@@ -266,7 +268,7 @@ var YangonKit = class extends import_commandkit2.CompilerPlugin {
+       overwrite: true
+     });
+     const label = source.getChildrenOfKind(import_ts_morph2.SyntaxKind.LabeledStatement)[0];
+-    if (label.getLabel().getText() !== "$") return;
++    if (!label || label.getLabel().getText() !== "$") return;
+     const neighbor = label.getNextSibling((node) => node.isKind(import_ts_morph2.SyntaxKind.FunctionDeclaration));
+     if (!neighbor) throw new Error("Nearest neighbor not a function.");
+     const commandMacro = label.getDescendantsOfKind(import_ts_morph2.SyntaxKind.CallExpression)[0];
+diff --git a/dist/index.mjs b/dist/index.mjs
+index 819902f03c77cb5777af9406df554b81a090647c..b378a9ff87dd6ae340caf6b9c32eff005eefacbb 100644
+--- a/dist/index.mjs
++++ b/dist/index.mjs
+@@ -192,7 +192,7 @@ const ${tmpVarName} = ${paramName}.interaction.options;
+ var YangonKit = class extends CompilerPlugin {
+   name = "com.retrouser955.commadkit.yangonkit";
+   async activate(ctx) {
+-    Logger2.info("YangonKit Activated");
++    Logger2.info("YangonKit Activated \x1b[1;35;49m(Patched)\x1b[0m");
+     ctx.registerTemplate("command", async (args) => {
+       const namePlain = args.splice(0, 1)[0];
+       if (!namePlain) throw new Error("name is required.");
+@@ -215,7 +215,8 @@ var YangonKit = class extends CompilerPlugin {
+     Logger2.info("YangonKit going out!");
+   }
+   async transform(params) {
+-    const { code, id } = params;
++    const { code } = params;
++    const id = params.id.replace(/\\/g, "/")
+     if (!id.includes("/commands/")) return;
+     if (id.endsWith("+middleware.ts")) return;
+     Logger2.info(`[YANGON KIT]: Generating code for: ${id}`);
+@@ -227,7 +228,7 @@ var YangonKit = class extends CompilerPlugin {
+       overwrite: true
+     });
+     const label = source.getChildrenOfKind(SyntaxKind2.LabeledStatement)[0];
+-    if (label.getLabel().getText() !== "$") return;
++    if (!label || label.getLabel().getText() !== "$") return;
+     const neighbor = label.getNextSibling((node) => node.isKind(SyntaxKind2.FunctionDeclaration));
+     if (!neighbor) throw new Error("Nearest neighbor not a function.");
+     const commandMacro = label.getDescendantsOfKind(SyntaxKind2.CallExpression)[0];
