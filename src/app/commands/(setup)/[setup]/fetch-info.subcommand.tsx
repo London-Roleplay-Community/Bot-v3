@@ -1,8 +1,8 @@
 import { ChatInputCommand, CommandData, Container, Separator, TextDisplay } from "commandkit";
-import { load } from "../../../../../utils/jsonUtil.ts";
 import hexadecimalToDecimal from "../../../../../utils/hexadecimalToDecimal.ts";
 import { CFlags } from "../../../../../utils/types/CFlags.ts";
 import { SeparatorSpacingSize } from "discord.js";
+import { guildsCollection } from "../../../../../utils/configuration/database.ts";
 
 export const command: CommandData = {
   name: 'fetch-info',
@@ -10,8 +10,8 @@ export const command: CommandData = {
 };
 
 export const chatInput: ChatInputCommand = async ({ interaction }) => {
-  if (!interaction.guild) return interaction.reply({ content: "Not a guild" })
-  const serverInfo = await load(interaction.guild.id)
+  if (!interaction.guild || !interaction.guildId) return interaction.reply({ content: "Not a guild" })
+  const serverInfo = await guildsCollection.findOne({ id: interaction.guildId })
   if (!serverInfo) return interaction.reply({ content: "Failed to fetch" })
 
   const _channels = Object.entries(serverInfo.channels).map(([k,v]) => `**${k}**: ${v || "not set"}`).join("\n")

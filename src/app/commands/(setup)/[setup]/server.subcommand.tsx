@@ -1,4 +1,4 @@
-import { type ChatInputCommand, type CommandData, Container, TextDisplay, Separator, ActionRow, ChannelSelectMenu, Button } from 'commandkit';
+import { type ChatInputCommand, type CommandData, Container, TextDisplay, Separator, ActionRow, ChannelSelectMenu, Button, Section } from 'commandkit';
 import { ButtonStyle, ChannelType, MessageFlags, SeparatorSpacingSize } from 'discord.js';
 
 export const command: CommandData = {
@@ -27,7 +27,7 @@ export const chatInput: ChatInputCommand = async ({interaction}) => {
         <ActionRow><ChannelSelectMenu customId={`setup_actionLogs_${interaction.user.id}`} channelTypes={[ ChannelType.GuildForum ]}/></ActionRow>
         <TextDisplay>**In-game sanctions (forum channel):**</TextDisplay>
         <ActionRow><ChannelSelectMenu customId={`setup_inGameSanctions_${interaction.user.id}`} channelTypes={[ ChannelType.GuildForum ]}/></ActionRow>
-        </Container>
+      </Container>
   );
   const setupReply2 = (
       <Container> 
@@ -42,6 +42,13 @@ export const chatInput: ChatInputCommand = async ({interaction}) => {
       </ActionRow>
       </Container>
   )
+  const setupReply3 = (
+    <Container>
+      <ActionRow>
+        <Button customId='setup_roles_modal'>Open roles setup modal</Button>
+      </ActionRow>
+    </Container>
+  )
 
-  return interaction.reply({ components: [setupReply, setupReply2], flags: [ MessageFlags.IsComponentsV2 ] })
+  return interaction.reply({ components: [setupReply, setupReply2, setupReply3], flags: [ MessageFlags.IsComponentsV2 ] })
 };

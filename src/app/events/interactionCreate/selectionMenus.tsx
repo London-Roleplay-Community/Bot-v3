@@ -4,7 +4,6 @@ import errorContainer from '../../components/errorContainer.tsx';
 import { MessageFlags } from 'discord.js';
 import successContainer from '../../components/successContainer.tsx';
 import { CFlags } from '../../../../utils/types/CFlags.ts';
-import { load } from '../../../../utils/jsonUtil.ts';
 import { ServerInfoData } from '../../../../utils/types/jsonData.ts';
 import { guildsCollection } from '../../../../utils/configuration/database.ts';
 
