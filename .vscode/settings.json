@@ -10,4 +10,10 @@
     "**/.DS_Store": true,
     "**/Thumbs.db": true
   },
+  "jest.runMode": "on-demand",
+  "js/ts.preferences.includePackageJsonAutoImports": "on",
+  "js/ts.autoClosingTags.enabled": true,
+  "terminal.integrated.autoReplies": {
+  "Terminate batch job (Y/N)?": "Y\r"
+}
 }

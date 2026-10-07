@@ -1,0 +1,7 @@
+information:
+  app_name: "LRC Bot v3"
+  version: "3.1.4-alpha"
+
+git:
+  hash: "git command"
+  title: "latest git title"
