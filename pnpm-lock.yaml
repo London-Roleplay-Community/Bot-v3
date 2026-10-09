@@ -5,7 +5,7 @@ settings:
   excludeLinksFromLockfile: false
 
 patchedDependencies:
-  yangonkit: fd7a216927806b288045d4a3fdd64817cc9dc00660e8ae0200a33ce41851712e
+  yangonkit: 0ce33d072fbb98c4a46474b34b8e2a040f092782f0eb7ce83737b460945b09d5
 
 importers:
 
@@ -46,7 +46,7 @@ importers:
         version: 2.9.1
       yangonkit:
         specifier: ^0.0.7
-        version: 0.0.7(patch_hash=fd7a216927806b288045d4a3fdd64817cc9dc00660e8ae0200a33ce41851712e)
+        version: 0.0.7(patch_hash=0ce33d072fbb98c4a46474b34b8e2a040f092782f0eb7ce83737b460945b09d5)
     devDependencies:
       '@eslint/js':
         specifier: ^10.0.1
@@ -6756,7 +6756,7 @@ snapshots:
 
   yaml@2.9.1: {}
 
-  yangonkit@0.0.7(patch_hash=fd7a216927806b288045d4a3fdd64817cc9dc00660e8ae0200a33ce41851712e):
+  yangonkit@0.0.7(patch_hash=0ce33d072fbb98c4a46474b34b8e2a040f092782f0eb7ce83737b460945b09d5):
     dependencies:
       ts-morph: 27.0.2
 

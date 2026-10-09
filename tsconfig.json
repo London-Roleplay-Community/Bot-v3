@@ -22,15 +22,21 @@
     "jsx": "react-jsx",
     "jsxImportSource": "commandkit",
     "paths": {
-      "@/*": ["./src/*"] 
-    }
+      "@/*": ["./src/*"],
+      "@utils/*": ["./utils/*"],
+      "@types/*": ["./utils/types/*"],
+      "@components/*": ["./src/app/components/*"],
+      "@functions/*": ["./utils/functions/*"]
+    },
+    "stripInternal": true
   },
   "include": [
     "src/**/*", 
     "commandkit.config.ts", 
     "commandkit-env.d.ts", 
     "scripts/**/*",
-    "utils/**/*"
+    "utils/**/*",
+    "global/globals.d.ts",
   ],
   "exclude": ["dist", "node_modules", ".commandkit"]
 }

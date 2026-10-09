@@ -1,6 +1,6 @@
 import { ChatInputCommand, CommandData, Container, Separator, TextDisplay } from "commandkit";
-import hexadecimalToDecimal from "../../../../../utils/hexadecimalToDecimal.ts";
-import { CFlags } from "../../../../../utils/types/CFlags.ts";
+import hexadecimalToDecimal from "../../../../../utils/code/hexadecimalToDecimal.ts";
+import { CFlags } from "../../../../../utils/types/misc/CFlags.ts";
 import { SeparatorSpacingSize } from "discord.js";
 import { guildsCollection } from "../../../../../utils/configuration/database.ts";
 

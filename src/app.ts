@@ -5,6 +5,7 @@ import { connect } from '../utils/configuration/database.ts';
 
 import { fetchApi, configureServer, isAnyErrorResponse } from 'rozod'
 import { getUsersAuthenticated } from 'rozod/endpoints/usersv1';
+import dts from '../utils/misc/configureDts.ts';
 
 //* fix mongo refusing to connect
 dns.setServers(['1.1.1.1']);
@@ -26,6 +27,9 @@ const me = await fetchApi(getUsersAuthenticated, undefined)
 if (!isAnyErrorResponse(me)) {
   Logger.log(`Logged in as ${me.name}`)
 }
+
+// configure shared values; too lazy to write full jsx elements!
+dts()
 
 
 export default client;

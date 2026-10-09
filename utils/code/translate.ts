@@ -1,6 +1,6 @@
 import { Logger } from "commandkit";
 import _trans from "googletrans";
-const trans = _trans.default
+const trans = _trans
 
 /**
  * Returns the ENGLSIH translation

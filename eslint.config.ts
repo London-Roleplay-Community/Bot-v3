@@ -17,7 +17,9 @@ export default defineConfig([
     },
     rules: {
       "no-undef": "off",
-      "no-unused-labels": "off"
+      "no-unused-labels": "off",
+      "react/react-in-jsx-scope": "off",
+      "react/jsx-no-undef": 'off'
     },
   },
 ]);

@@ -1,8 +1,24 @@
 diff --git a/dist/index.js b/dist/index.js
-index 7eb99c61175faee7773d639c6aa064720c7fda76..8e1d9642305c4475f9f8e25cd2ea106ab1fe0a09 100644
+index 7eb99c61175faee7773d639c6aa064720c7fda76..d547d990894323c7ac25883a423041a2deb6094e 100644
 --- a/dist/index.js
 +++ b/dist/index.js
-@@ -231,7 +231,7 @@ const ${tmpVarName} = ${paramName}.interaction.options;
+@@ -227,11 +227,23 @@ const ${tmpVarName} = ${paramName}.interaction.options;
+   return source.getText();
+ }
+ 
++function processAutocomplete(src, neighbor, label) {
++  const params = neighbor.getParameters().map((p) => p.getText()).join(", ")
++  const body = neighbor.getBodyText() ?? ""
++  label.remove()
++  neighbor.replaceWithText(
++    `export const autocomplete: import('commandkit').AutocompleteCommand = async (${params}) => {
++    ${body}
++    }`
++  )
++  return source.getText()
++}
++
+ // src/Classes/YangonKit.ts
  var YangonKit = class extends import_commandkit2.CompilerPlugin {
    name = "com.retrouser955.commadkit.yangonkit";
    async activate(ctx) {
@@ -11,31 +27,292 @@ index 7eb99c61175faee7773d639c6aa064720c7fda76..8e1d9642305c4475f9f8e25cd2ea106a
      ctx.registerTemplate("command", async (args) => {
        const namePlain = args.splice(0, 1)[0];
        if (!namePlain) throw new Error("name is required.");
-@@ -254,7 +254,9 @@ var YangonKit = class extends import_commandkit2.CompilerPlugin {
+@@ -254,32 +266,36 @@ var YangonKit = class extends import_commandkit2.CompilerPlugin {
      import_commandkit2.Logger.info("YangonKit going out!");
    }
    async transform(params) {
 -    const { code, id } = params;
-+    console.log("[yangonkit] transform:", Object.keys(params), params.id)
 +    const { code } = params;
 +    const id = params.id.replace(/\\/g, "/");
      if (!id.includes("/commands/")) return;
      if (id.endsWith("+middleware.ts")) return;
-     import_commandkit2.Logger.info(`[YANGON KIT]: Generating code for: ${id}`);
-@@ -266,7 +268,7 @@ var YangonKit = class extends import_commandkit2.CompilerPlugin {
-       overwrite: true
+-    import_commandkit2.Logger.info(`[YANGON KIT]: Generating code for: ${id}`);
++    const MACROS = ["SlashCommand", "Autocomplete"];
++    const getMacroName = (l) => l.getDescendantsOfKind(import_ts_morph2.SyntaxKind2.CallExpression)[0]?.getExpression().getText();
+     const project = new import_ts_morph2.Project({
+       skipAddingFilesFromTsConfig: true,
+       useInMemoryFileSystem: true
      });
-     const label = source.getChildrenOfKind(import_ts_morph2.SyntaxKind.LabeledStatement)[0];
+-    const source = project.createSourceFile(id, code, {
+-      overwrite: true
+-    });
+-    const label = source.getChildrenOfKind(import_ts_morph2.SyntaxKind.LabeledStatement)[0];
 -    if (label.getLabel().getText() !== "$") return;
-+    if (!label || label.getLabel().getText() !== "$") return;
-     const neighbor = label.getNextSibling((node) => node.isKind(import_ts_morph2.SyntaxKind.FunctionDeclaration));
-     if (!neighbor) throw new Error("Nearest neighbor not a function.");
-     const commandMacro = label.getDescendantsOfKind(import_ts_morph2.SyntaxKind.CallExpression)[0];
+-    const neighbor = label.getNextSibling((node) => node.isKind(import_ts_morph2.SyntaxKind.FunctionDeclaration));
+-    if (!neighbor) throw new Error("Nearest neighbor not a function.");
+-    const commandMacro = label.getDescendantsOfKind(import_ts_morph2.SyntaxKind.CallExpression)[0];
+-    const name = commandMacro.getExpression().getText();
+-    if (!["SlashCommand"].includes(name)) return;
+-    let result = void 0;
+-    if (name === "SlashCommand") {
+-      result = processSlashCommand(source, neighbor, commandMacro, label);
++    const source = project.createSourceFile(id, code, { overwrite: true });
++    let changed = false;
++    while (true) {
++      const label = source.getChildrenOfKind(import_ts_morph2.SyntaxKind.LabeledStatement).find(
++        (l) => l.getLabel().getText() === "$" && MACROS.includes(getMacroName(l) ?? "")
++      );
++      if (!label) break;
++      import_commandkit2.Logger.info(`[YANGON KIT]: Generating code for: ${id}`);
++      const neighbor = label.getNextSibling((node) => node.isKind(import_ts_morph2.SyntaxKind.FunctionDeclaration));
++      if (!neighbor) throw new Error("Nearest neighbor not a function.");
++      const commandMacro = label.getDescendantsOfKind(import_ts_morph2.SyntaxKind.CallExpression)[0];
++      const name = commandMacro.getExpression().getText();
++      if (name === "SlashCommand") processSlashCommand(source, neighbor, commandMacro, label);
++      else if (name === "Autocomplete") processAutocomplete(source, neighbor, label);
++      changed = true;
++    }
++    if (changed) {
++      import_commandkit2.Logger.info(`[YANGON KIT]: Finished code for: ${id}`);
++      return { code: source.getText() };
+     }
+-    import_commandkit2.Logger.info(`[YANGON KIT]: Finished code for: ${id}`);
+-    if (result) return {
+-      code: result
+-    };
+   }
+ };
+ 
 diff --git a/dist/index.mjs b/dist/index.mjs
-index 819902f03c77cb5777af9406df554b81a090647c..b378a9ff87dd6ae340caf6b9c32eff005eefacbb 100644
+index 819902f03c77cb5777af9406df554b81a090647c..d7b7c430d98335b01b39dcd2dbde5003533d14b8 100644
 --- a/dist/index.mjs
 +++ b/dist/index.mjs
-@@ -192,7 +192,7 @@ const ${tmpVarName} = ${paramName}.interaction.options;
+@@ -1,6 +1,6 @@
+ // src/Classes/YangonKit.ts
+ import { CompilerPlugin, Logger as Logger2 } from "commandkit";
+-import { Project, SyntaxKind as SyntaxKind2 } from "ts-morph";
++import { Project, SyntaxKind as SyntaxKind2, Node } from "ts-morph";
+ import { writeFile } from "fs/promises";
+ import path from "path";
+ 
+@@ -90,7 +90,7 @@ const ${tmpVarName} = ${paramName}.interaction.options;
+             initializer: initializer.getText()
+           }]
+         });
+-        autoCompleteHandlers.push(handlerName);
++        autoCompleteHandlers.push({ optionName, handlerName });
+         autocomplete.setInitializer("true");
+       } else {
+         Logger.warn(`Autocomplete handler for option "${optionName}" is not a function or identifier. Skipping autocomplete handler generation for this option.`);
+@@ -150,49 +150,181 @@ const ${tmpVarName} = ${paramName}.interaction.options;
+       }).writeLine("]");
+     }
+   });
+-  if (autoCompleteHandlers.length > 0) {
+-    source.addVariableStatement({
+-      declarationKind: VariableDeclarationKind.Const,
+-      isExported: true,
+-      declarations: [
+-        {
+-          name: "autocomplete",
+-          initializer: (writer) => {
+-            const autoCompleteInteractionVar = `__kit_tmp_auto_interaction_${generateCurrentUnix()}`;
+-            writer.writeLine(`async (${autoCompleteInteractionVar}) => {`);
+-            writer.indent(() => {
+-              const autoCompleteCommandName = `__kit_tmp_auto_command_name_${generateCurrentUnix()}`;
+-              writer.writeLine(`const ${autoCompleteCommandName} = ${autoCompleteInteractionVar}.interaction.commandName;`);
+-              writer.indent(() => {
+-                autoCompleteHandlers.forEach((handler) => {
+-                  const handlerCommandName = handler.split("_").slice(4, -2).join("_");
+-                  writer.writeLine(`if(${autoCompleteCommandName} === "${handlerCommandName}") {`);
+-                  writer.indent(() => {
+-                    const autoCompleteResultVar = `__kit_tmp_auto_result_${generateCurrentUnix()}`;
+-                    writer.writeLine(`const ${autoCompleteResultVar} = await ${handler}(${autoCompleteInteractionVar});`);
+-                    writer.writeLine(`if(Array.isArray(${autoCompleteResultVar}) && ${autoCompleteResultVar}.length > 0) ${autoCompleteInteractionVar}.interaction.respond(${autoCompleteResultVar})`);
+-                    writer.writeLine("return;");
+-                  });
+-                  writer.writeLine("}");
+-                });
+-              });
+-            });
+-            writer.writeLine(`}`);
+-          },
+-          type: "import('commandkit').AutocompleteCommand"
+-        }
+-      ]
+-    });
+-  }
++if (autoCompleteHandlers.length > 0) {
++  const branches = autoCompleteHandlers.map(({ optionName, handlerName }) => `
++  if (focused.name === ${JSON.stringify(optionName)}) {
++    const result = await ${handlerName}(ctx);
++    if (Array.isArray(result) && !ctx.interaction.responded) {
++      await ctx.interaction.respond(
++        result.map((c) => typeof c === "string" ? { name: c, value: c } : c).slice(0, 25)
++      );
++    }
++    return;
++  }`).join("");
++  source.addStatements(`export const autocomplete: import('commandkit').AutocompleteCommand = async (ctx) => {
++  const focused = ctx.interaction.options.getFocused(true);${branches}
++};`);
++}
+   label.remove();
+   return source.getText();
+ }
+ 
++function processAutocomplete(source, neighbor, label, handlers) {
++  const arg = label.getDescendantsOfKind(SyntaxKind2.CallExpression)[0].getArguments()[0];
++  const option = arg ? arg.getText() : null;
++  const params = neighbor.getParameters().map((p) => p.getText()).join(", ");
++  const body = neighbor.getBodyText() ?? "";
++  const fnName = `__kit_ac_${handlers.length}`;
++  label.remove();
++  neighbor.replaceWithText(`const ${fnName} = async (${params}) => {\n${body}\n};`);
++  handlers.push({ option, fnName });
++}
++
++function emitAutocomplete(source, handlers) {
++  const branches = handlers.map((h) =>
++    `if (${h.option ? `focused.name === ${h.option}` : "true"}) result = await ${h.fnName}({ ...ctx, focused });`
++  ).join("\n  ");
++  source.addStatements(`
++export const autocomplete: import('commandkit').AutocompleteCommand = async (ctx) => {
++  const focused = ctx.interaction.options.getFocused(true);
++  let result: any;
++  ${branches}
++  if (!Array.isArray(result) || ctx.interaction.responded) return;
++  const q = String(focused.value).toLowerCase();
++  const choices = result
++    .map((c: any) => typeof c === "string" ? { name: c, value: c } : c)
++    .filter((c: any) => c.name.toLowerCase().includes(q))
++    .slice(0, 25);
++  await ctx.interaction.respond(choices);
++};`);
++}
++// src/Classes/Generators/InteractionMacros.js
++var BASE_INTERACTION_METHODS = ["reply", "deferReply", "editReply", "followUp", "deleteReply"];
++
++var COMPONENT_MACROS = {
++  componentReply: ["IsComponentsV2"],
++  componentEphemeralReply: ["IsComponentsV2", "Ephemeral"],
++};
++var INTERACTION_METHODS = [...BASE_INTERACTION_METHODS, ...Object.keys(COMPONENT_MACROS)];
++
++var KIT_FLAGS = "__KitMessageFlags";
++
++function ensureFlagsImport(source) {
++  const already = source.getImportDeclarations().some(
++    (d) =>
++      d.getModuleSpecifierValue() === "discord.js" &&
++      d.getNamedImports().some((n) => n.getAliasNode()?.getText() === KIT_FLAGS)
++  );
++  if (already) return;
++  source.insertImportDeclaration(0, {
++    moduleSpecifier: "discord.js",
++    namedImports: [{ name: "MessageFlags", alias: KIT_FLAGS }],
++  });
++}
++
++function buildComponentArgs(callArgs, flagNames) {
++  const flagList = flagNames.map((f) => `${KIT_FLAGS}.${f}`).join(", ");
++  const first = callArgs[0];
++
++  if (!first) return `{ flags: [${flagList}] }`;
++
++  if (first.isKind(SyntaxKind2.ObjectLiteralExpression)) {
++    const existing = first.getProperty("flags");
++    if (existing && existing.isKind(SyntaxKind2.PropertyAssignment)) {
++      existing.setInitializer(`[...[${existing.getInitializer().getText()}].flat(), ${flagList}]`);
++    } else if (existing) {
++      existing.replaceWithText(`flags: [...[${existing.getText()}].flat(), ${flagList}]`);
++    } else {
++      first.addPropertyAssignment({ name: "flags", initializer: `[${flagList}]` });
++    }
++    return first.getText();
++  }
++
++  return `{ components: ${first.getText()}, flags: [${flagList}] }`;
++}
++
++function getInteractionMacro(label) {
++  if (label.getLabel().getText() !== "$") return null;
++  const stmt = label.getStatement();
++  if (stmt.getKind() !== SyntaxKind2.ExpressionStatement) return null;
++  const call = stmt.getExpression();
++  if (call.getKind() !== SyntaxKind2.CallExpression) {
++    Logger2.info(`[YANGONKIT] not a call: ${call.getKindName()}`);
++    return null;
++  }
++  const callee = call.getExpression();
++  if (callee.getKind() !== SyntaxKind2.Identifier) {
++    Logger2.info(`[YANGONKIT] callee not identifier: ${callee.getKindName()}`);
++    return null;
++  }
++  const name = callee.getText();
++  return INTERACTION_METHODS.includes(name) ? name : null;
++}
++
++function resolveInteractionRef(fn) {
++  const param = fn.getParameters()[0];
++  if (!param) throw new Error("[YANGON KIT]: $: reply() needs the command function to take a context parameter.");
++  const nameNode = param.getNameNode();
++  if (nameNode.getKind() === SyntaxKind2.ObjectBindingPattern) {
++    const el = nameNode.getElements().find(
++      (e) => (e.getPropertyNameNode()?.getText() ?? e.getName()) === "interaction"
++    );
++    if (!el) throw new Error("[YANGON KIT]: destructure `interaction` from the context to use $: reply().");
++    return el.getName();
++  }
++  return `${nameNode.getText()}.interaction`;
++}
++
++function processInteractionMacros(source) {
++  let changed = false;
++  let needsFlagsImport = false;
++  while (true) {
++    const label = source
++      .getDescendantsOfKind(SyntaxKind2.LabeledStatement)
++      .find((l) => getInteractionMacro(l) !== null);
++    if (!label) break;
++
++    const macro = getInteractionMacro(label);
++    const call = label.getStatement().getExpression();
++
++    let method = macro;
++    let args;
++    if (Object.hasOwn(COMPONENT_MACROS, macro)) {
++      method = "reply";
++      args = buildComponentArgs(call.getArguments(), COMPONENT_MACROS[macro]);
++      needsFlagsImport = true;
++    } else {
++      args = call.getArguments().map((a) => a.getText()).join(", ");
++    }
++
++    const commandFn = label.getFirstAncestor(
++      (n) => n.getKind() === SyntaxKind2.FunctionDeclaration && n.getParent() === source
++    );
++    if (!commandFn) throw new Error(`[YANGON KIT]: $: ${macro}() must be used inside a command function.`);
++
++    const nearestFn = label.getFirstAncestor((n) =>
++      [
++        SyntaxKind2.FunctionDeclaration,
++        SyntaxKind2.ArrowFunction,
++        SyntaxKind2.FunctionExpression,
++        SyntaxKind2.MethodDeclaration,
++      ].includes(n.getKind())
++    );
++    const isAsync = !!nearestFn && typeof nearestFn.isAsync === "function" && nearestFn.isAsync();
++
++    const ref = resolveInteractionRef(commandFn);
++    label.replaceWithText(`${isAsync ? "await " : ""}${ref}.${method}(${args});`);
++    changed = true;
++  }
++  if (needsFlagsImport) ensureFlagsImport(source);
++  return changed;
++}
++
+ // src/Classes/YangonKit.ts
  var YangonKit = class extends CompilerPlugin {
    name = "com.retrouser955.commadkit.yangonkit";
    async activate(ctx) {
@@ -44,22 +321,62 @@ index 819902f03c77cb5777af9406df554b81a090647c..b378a9ff87dd6ae340caf6b9c32eff00
      ctx.registerTemplate("command", async (args) => {
        const namePlain = args.splice(0, 1)[0];
        if (!namePlain) throw new Error("name is required.");
-@@ -215,7 +215,8 @@ var YangonKit = class extends CompilerPlugin {
+@@ -215,32 +347,39 @@ var YangonKit = class extends CompilerPlugin {
      Logger2.info("YangonKit going out!");
    }
    async transform(params) {
 -    const { code, id } = params;
 +    const { code } = params;
-+    const id = params.id.replace(/\\/g, "/")
++    const id = params.id.replace(/\\/g, "/");
      if (!id.includes("/commands/")) return;
      if (id.endsWith("+middleware.ts")) return;
-     Logger2.info(`[YANGON KIT]: Generating code for: ${id}`);
-@@ -227,7 +228,7 @@ var YangonKit = class extends CompilerPlugin {
-       overwrite: true
+-    Logger2.info(`[YANGON KIT]: Generating code for: ${id}`);
++    const MACROS = ["SlashCommand", "Autocomplete"];
++    const getMacroName = (l) => l.getDescendantsOfKind(SyntaxKind2.CallExpression)[0]?.getExpression().getText();
+     const project = new Project({
+       skipAddingFilesFromTsConfig: true,
+       useInMemoryFileSystem: true
      });
-     const label = source.getChildrenOfKind(SyntaxKind2.LabeledStatement)[0];
+-    const source = project.createSourceFile(id, code, {
+-      overwrite: true
+-    });
+-    const label = source.getChildrenOfKind(SyntaxKind2.LabeledStatement)[0];
 -    if (label.getLabel().getText() !== "$") return;
-+    if (!label || label.getLabel().getText() !== "$") return;
-     const neighbor = label.getNextSibling((node) => node.isKind(SyntaxKind2.FunctionDeclaration));
-     if (!neighbor) throw new Error("Nearest neighbor not a function.");
-     const commandMacro = label.getDescendantsOfKind(SyntaxKind2.CallExpression)[0];
+-    const neighbor = label.getNextSibling((node) => node.isKind(SyntaxKind2.FunctionDeclaration));
+-    if (!neighbor) throw new Error("Nearest neighbor not a function.");
+-    const commandMacro = label.getDescendantsOfKind(SyntaxKind2.CallExpression)[0];
+-    const name = commandMacro.getExpression().getText();
+-    if (!["SlashCommand"].includes(name)) return;
+-    let result = void 0;
+-    if (name === "SlashCommand") {
+-      result = processSlashCommand(source, neighbor, commandMacro, label);
++    const source = project.createSourceFile(id, code, { overwrite: true });
++    let changed = false;
++    const handlers = [];
++    if (processInteractionMacros(source)) changed = true;
++    while (true) {
++      const label = source.getChildrenOfKind(SyntaxKind2.LabeledStatement).find(
++        (l) => l.getLabel().getText() === "$" && MACROS.includes(getMacroName(l) ?? "")
++      );
++      if (!label) break;
++      Logger2.info(`[YANGON KIT]: Generating code for: ${id}`);
++      const neighbor = label.getNextSibling((node) => node.isKind(SyntaxKind2.FunctionDeclaration));
++      if (!neighbor) throw new Error("Nearest neighbor not a function.");
++      const commandMacro = label.getDescendantsOfKind(SyntaxKind2.CallExpression)[0];
++      const name = commandMacro.getExpression().getText();
++      if (name === "SlashCommand") processSlashCommand(source, neighbor, commandMacro, label);
++      else if (name === "Autocomplete") processAutocomplete(source, neighbor, label, handlers);
++      changed = true;
++    }
++    if (handlers.length) emitAutocomplete(source, handlers)
++    if (changed) {
++      Logger2.info(`[YANGON KIT]: Finished code for: ${id}`);
++      return { code: source.getText() };
+     }
+-    Logger2.info(`[YANGON KIT]: Finished code for: ${id}`);
+-    if (result) return {
+-      code: result
+-    };
+   }
+ };
+ 

@@ -1,6 +1,6 @@
 import { type ChatInputCommand, type CommandData, AutocompleteCommand, Logger } from 'commandkit';
 import { ApplicationCommandOptionType, ApplicationCommandType, ChatInputApplicationCommandData, EmbedBuilder, MessageFlags } from 'discord.js';
-import { translate, translateLang } from '../../../../../utils/translate.ts';
+import { translate, translateLang } from '../../../../../utils/code/translate.ts';
 import errorContainer from '../../../components/errorContainer.tsx';
 
 const languages = [
@@ -104,4 +104,4 @@ export const chatInput: ChatInputCommand = async ({interaction}) => {
       return interaction.reply({ embeds: [response], flags: [MessageFlags.Ephemeral] })
     }
   }
-}; //TODO: Link up translate file with this and return that with jsx components
+};

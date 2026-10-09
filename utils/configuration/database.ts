@@ -1,6 +1,7 @@
 import { Logger } from "commandkit";
 import { MongoClient, ServerApiVersion } from "mongodb";
-import { ServerConfig } from "./schema.ts";
+import { ServerConfig } from "../types/db/dbDecs.ts";
+import { User } from "@utils/types/db/users.ts";
 
 if (!process.env.MONGODB_URI) {
   throw new Error("No mongodb uri")
@@ -12,7 +13,8 @@ export const guilds = mClient.db("servers")
 export const guildsCollection = guilds.collection<ServerConfig>("server_info")
 
 export const roblox = mClient.db("roblox")
-export const groups = roblox.collection("groups")
+export const groups = roblox.collection<Record<string,string>>("groups")
+export const users = roblox.collection<User>("users")
 
 export async function connect() {
   try {

@@ -1,5 +1,5 @@
 import { Container, Separator, StringEncodable, TextDisplay } from "commandkit";
-import hexadecimalToDecimal from "../../../utils/hexadecimalToDecimal.ts";
+import hexadecimalToDecimal from "../../../utils/code/hexadecimalToDecimal.ts";
 
 export default function errorContainer(errorMessage: StringEncodable) {
   return (
