@@ -3,6 +3,9 @@
 +++<sub>Jaxon Beltran - jaxon@jxson.tech - Version 3.1.4-Alpha, 2026-09-30, 2026-09-27</sub>+++
 
 ## Bot-v3: The third iteration of our Discord bot.
+
+## Archived: Please check Gobot-v3 now
+
 ### Usage
 The bot uses slash commands and ComponentsV2. It's fairly simple to understand.
 
